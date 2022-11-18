@@ -10,7 +10,7 @@ module.exports.DataService = class DataService {
         this.CreateTask('Repeat', 'Repeat description', false);
     }
     static Validate(_id, _name, _completed) {
-        if (_id && !this.Data.Any(t => t.id == _id)) throw new Error("No such id!");
+        if (_id && !this.Data.some(t => t.id == _id)) throw new Error("No such id!");
         if (_name) {
             if (typeof _name != "string") throw new Error("Name must me a string!");
             if (_name.length > 32) throw new Error("Name string is too long! Max len - 32");
@@ -48,5 +48,12 @@ module.exports.DataService = class DataService {
             taskToUpdate.desc = _desc;
         if (_completed != null)
             taskToUpdate.completed = _completed;
+    }
+
+    static DeleteTask(_id) {
+        if (_id == null) throw new Error("No task id provided");
+        this.Validate(_id, null, null);
+
+        this.Data = this.Data.filter(t => t.id != _id);
     }
 }
