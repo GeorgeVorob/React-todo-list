@@ -1,4 +1,4 @@
-import { Box, Divider, List, Modal, Typography } from "@mui/material";
+import { Box, Button, Divider, List, Modal, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import TaskCard from "./TaskCard";
 import TaskViewAndEditModal from "./TaskViewAndEditModal";
@@ -45,6 +45,17 @@ function TaskList() {
             <Divider />
         </List>
 
+        {/*New task form */}
+        <div style={{ border: '1px dashed gray', padding: 15 }}>
+            <TextField
+                required
+                id="task-name"
+                label="New task name"
+                defaultValue="Hello World"
+            />
+            <TextField label="Description" sx={{ width: '100%' }} multiline id='task-desc' />
+            <Button>Add</Button>
+        </div>
         <TaskViewAndEditModal
             opened={modalOpened}
             closeCallback={OnModalClose} />

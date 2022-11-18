@@ -46,7 +46,7 @@ function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
     else {
         taskData = (
             <>
-                <TextField sx={{ width: '100%', marginBottom: '10px' }} multiline id='new-desc' rows={5} ></TextField>
+                <TextField sx={{ width: '100%', marginBottom: '10px' }} multiline id='new-desc' rows={5} />
                 <Button onClick={OnEditSubmit}>Save</Button>
                 <Button onClick={() => setEditMode(false)}>Discard</Button>
             </>
