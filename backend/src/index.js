@@ -3,6 +3,8 @@ const { UseTasks } = require('./controllers/tasks');
 const { DataService } = require('./services/DataService');
 
 var app = express();
+app.use(express.json())
+
 app.get('/', function (req, res) {
     res.send('Hello World!');
 });
