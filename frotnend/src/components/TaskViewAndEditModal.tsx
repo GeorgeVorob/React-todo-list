@@ -1,9 +1,13 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Backdrop, Box, Button, Fade, Modal, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { NewTaskInputs, NewTaskSchema, TaskType } from "../data/Task";
 
 interface TaskViewAndEditModalProps {
-    opened: boolean,
+    taskInfo: TaskType | null
     closeCallback: () => void
+    updateTaskCallback: (id: number, newDesc: string, newName: string) => void
 }
 
 function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
@@ -22,34 +26,54 @@ function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
     const [editMode, setEditMode] = useState(false);
 
     function OnModalClose() {
-        setEditMode(false);
         props.closeCallback();
+        setEditMode(false);
     }
 
     function OnEditStart() {
+        reset();
         setEditMode(true);
     }
-
-    function OnEditSubmit() {
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<NewTaskInputs>({
+        resolver: zodResolver(NewTaskSchema)
+    });
+    const onTaskUpdateSubmit: SubmitHandler<NewTaskInputs> = (data) => {
         setEditMode(false);
+        props.updateTaskCallback(props.taskInfo?.id!, data.desc, data.name);
+        OnModalClose();
     }
 
     let taskData;
     if (!editMode) {
         taskData = (<>
+            <Typography id="transition-modal-title" variant="h6" component="h2">
+                {props.taskInfo?.name}
+            </Typography>
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                Task description.
+                {props.taskInfo?.desc}
             </Typography>
             <Button onClick={OnEditStart}>Edit</Button>
         </>)
     }
     else {
         taskData = (
-            <>
-                <TextField sx={{ width: '100%', marginBottom: '10px' }} multiline id='new-desc' rows={5} />
-                <Button onClick={OnEditSubmit}>Save</Button>
+            <form onSubmit={handleSubmit(onTaskUpdateSubmit)}>
+                <TextField
+                    required
+                    id="task-name"
+                    label="New task name"
+                    defaultValue={props.taskInfo?.name}
+                    {...register("name")}
+                />
+                {errors.name && <span>{errors.name.message}</span>}
+                <TextField
+                    defaultValue={props.taskInfo?.desc}
+                    sx={{ width: '100%', marginBottom: '10px' }} multiline id='new-desc' rows={5}
+                    {...register("desc")}
+                />
+                <Button type="submit">Save</Button>
                 <Button onClick={() => setEditMode(false)}>Discard</Button>
-            </>
+            </form>
         )
     }
 
@@ -58,7 +82,7 @@ function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
-                open={props.opened}
+                open={props.taskInfo ? true : false}
                 onClose={OnModalClose}
                 closeAfterTransition
                 BackdropComponent={Backdrop}
@@ -66,13 +90,10 @@ function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
                     timeout: 500,
                 }}
             >
-                <Fade in={props.opened}>
-                    <Box sx={style}>
-                        <Typography id="transition-modal-title" variant="h6" component="h2">
-                            Text in a modal
-                        </Typography>
+                <Fade in={props.taskInfo ? true : false}>
+                    <Box sx={style} key={props.taskInfo?.id}>
                         <p>Created 12.12.2012</p>
-                        <p>Status: completed</p>
+                        <p>Status: {props.taskInfo?.completed ? 'completed' : 'in progress'}</p>
                         {taskData}
                     </Box>
                 </Fade>
