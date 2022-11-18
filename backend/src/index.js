@@ -1,9 +1,16 @@
 var express = require('express');
+const { UseTasks } = require('./controllers/tasks');
+const { DataService } = require('./services/DataService');
 
-var app = express(); app.get('/', function (req, res) {
+var app = express();
+app.get('/', function (req, res) {
     res.send('Hello World!');
 });
 
-app.listen(3000, function () {
-    console.log('Listening port 3000');
+UseTasks(app);
+
+DataService.InitDefaultData();
+
+app.listen(3001, function () {
+    console.log('Listening port 3001');
 });
