@@ -18,8 +18,9 @@ module.exports.DataService = class DataService {
         if (_completed && typeof _completed != "boolean") throw new Error("complete must me boolean!");
     }
 
-    static CreateTask(_name, _desc, _completed) {
-        this.Validate(null, _name, null);
+    static CreateTask(_name, _desc = "", _completed = false) {
+        if (_name == null) throw new Error("No task name provided");
+        this.Validate(null, _name, _completed);
 
         this.Data.push(
             {

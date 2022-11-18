@@ -5,6 +5,21 @@ module.exports.UseTasks = UseTasks = (app) => {
         res.json(DataService.GetTasks());
     });
 
+    app.post('/tasks', function (req, res) {
+        let data = req.body;
+        try {
+            DataService.CreateTask(data.name, data.desc, data.completed);
+            res.sendStatus(200);
+        }
+        catch (error) {
+            console.log(error);
+
+            res.status(400);
+            res.json(error.message);
+        }
+    });
+
+
     app.put('/tasks', function (req, res) {
         let data = req.body;
         try {
