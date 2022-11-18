@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, IconButton, ListItemButton, ToggleButton } from "@mui/material";
+import { Button, ButtonGroup, IconButton, ToggleButton } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import { useState } from "react";
@@ -6,7 +6,7 @@ import { TaskType } from "../data/Task";
 
 interface TaskCardProps {
     taskInfo: TaskType
-    cardClickCallback: (id: number) => void
+    cardClickCallback: (task: TaskType) => void
     deleteButtonClickCallback: (id: number) => void
     taskToggleCallback: (id: number, state: boolean) => void
 }
@@ -22,11 +22,8 @@ function TaskCard(props: TaskCardProps) {
     function OnToggleClick(event: React.MouseEvent) {
         event.stopPropagation();
 
-        setSelected(!selected);
         props.taskToggleCallback(props.taskInfo.id, !props.taskInfo.completed);
     }
-
-    const [selected, setSelected] = useState(false);
 
     return (
         <ButtonGroup
@@ -34,7 +31,7 @@ function TaskCard(props: TaskCardProps) {
                 width: '100%'
             }}
             variant="text"
-            onClick={() => props.cardClickCallback(4)}>
+            onClick={() => props.cardClickCallback(props.taskInfo)}>
             <Button
                 sx={{
                     width: '100%',

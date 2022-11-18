@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import APIService from "../services/APIService";
 import TaskCard from "./TaskCard";
 import TaskViewAndEditModal from "./TaskViewAndEditModal";
-import { NewTaskSchema } from "../data/Task";
+import { NewTaskSchema, TaskType } from "../data/Task";
 
 type NewTaskInputs = {
     name: string,
@@ -16,8 +16,6 @@ type NewTaskInputs = {
 
 
 function TaskList() {
-    const [modalOpened, SetModalOpened] = useState(false);
-
     const queryClient = useQueryClient();
     const { status, data } = useQuery({ queryKey: ['getTasks'], queryFn: APIService.GetTasks })
     const newTaskMutation = useMutation({
@@ -45,22 +43,23 @@ function TaskList() {
     const onTaskCreation: SubmitHandler<NewTaskInputs> = (data) => {
         newTaskMutation.mutate({ name: data.name, desc: data.desc });
     }
-
     function OnTaskDeleteButtonClick(id: number) {
         deleteTaskMutation.mutate(id);
     }
-
     function OnTaskToggle(id: number, state: boolean) {
         updateTaskMutation.mutate({ id: id, completed: state });
     }
 
 
-    function OnTaskClick() {
-        SetModalOpened(true);
+    const [taskInModal, SetTaskInModal] = useState<TaskType | null>(null);
+    function OnTaskClick(taskToModal: TaskType) {
+        SetTaskInModal(taskToModal);
     }
-
     function OnModalClose() {
-        SetModalOpened(false);
+        SetTaskInModal(null);
+    }
+    function OnTaskInModalUpdate(id: number, newDesc: string) {
+        updateTaskMutation.mutate({ id: id, desc: newDesc });
     }
 
     let tasksDisplay;
@@ -88,7 +87,7 @@ function TaskList() {
             {tasksDisplay}
         </List>
 
-        {/*New task form */}
+        {/*New task form. TODO: Move to external component. */}
         <form
             onSubmit={handleSubmit(onTaskCreation)}
             style={{ border: '1px dashed gray', padding: 15 }}>
@@ -110,7 +109,8 @@ function TaskList() {
         </form>
 
         <TaskViewAndEditModal
-            opened={modalOpened}
+            updateTaskCallback={OnTaskInModalUpdate}
+            taskInfo={taskInModal}
             closeCallback={OnModalClose} />
     </>);
 }
