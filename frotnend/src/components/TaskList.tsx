@@ -1,12 +1,18 @@
 import { Box, Button, Divider, List, Modal, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "react-query";
+import { isConditionalExpression } from "typescript";
+import APIService from "../services/APIService";
 import TaskCard from "./TaskCard";
 import TaskViewAndEditModal from "./TaskViewAndEditModal";
 
 function TaskList() {
 
-    const [tasks, SetTasks] = useState([]);
     const [modalOpened, SetModalOpened] = useState(false);
+    const queryClient = useQueryClient();
+
+    const [tasks, SetTasks] = useState([]);
+    const { status, data } = useQuery({ queryKey: ['todos'], queryFn: APIService.GetTasks })
 
     function OnTaskClick() {
         SetModalOpened(true);
@@ -24,25 +30,37 @@ function TaskList() {
         SetModalOpened(false);
     }
 
+    useEffect(() => {
+        APIService.GetTasks()
+            .then((data) => {
+                console.log(data);
+            })
+    }, []);
+
+    let tasksDisplay;
+    if (status == "loading") {
+        tasksDisplay = <h3>Loading...</h3>
+    }
+    if (status == "error") {
+        tasksDisplay = <h3>Error!</h3>
+    }
+    if (status == "success") {
+        tasksDisplay = data.map(t => {
+            return (<div key={t.id}>
+                <TaskCard
+                    taskInfo={t}
+                    cardClickCallback={OnTaskClick}
+                    deleteButtonClickCallback={OnTaskDeleteButtonClick}
+                    taskToggleCallback={OnTaskToggle}
+                ></TaskCard>
+                <Divider />
+            </div>)
+        })
+    }
+
     return (<>
         <List>
-            <TaskCard
-                cardClickCallback={OnTaskClick}
-                deleteButtonClickCallback={OnTaskDeleteButtonClick}
-                taskToggleCallback={OnTaskToggle}
-            ></TaskCard>
-            <Divider />
-            <TaskCard
-                cardClickCallback={OnTaskClick}
-                deleteButtonClickCallback={OnTaskDeleteButtonClick}
-                taskToggleCallback={OnTaskToggle}
-            ></TaskCard>
-            <Divider />            <TaskCard
-                cardClickCallback={OnTaskClick}
-                deleteButtonClickCallback={OnTaskDeleteButtonClick}
-                taskToggleCallback={OnTaskToggle}
-            ></TaskCard>
-            <Divider />
+            {tasksDisplay}
         </List>
 
         {/*New task form */}

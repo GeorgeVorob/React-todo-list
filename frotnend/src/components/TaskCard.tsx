@@ -2,8 +2,10 @@ import { Button, ButtonGroup, IconButton, ListItemButton, ToggleButton } from "@
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import { useState } from "react";
+import { TaskType } from "../data/Task";
 
 interface TaskCardProps {
+    taskInfo: TaskType
     cardClickCallback: (id: number) => void
     deleteButtonClickCallback: (id: number) => void
     taskToggleCallback: (id: number) => void
@@ -37,7 +39,7 @@ function TaskCard(props: TaskCardProps) {
                 sx={{
                     width: '100%',
                 }}
-            >I am a task</Button>
+            >{props.taskInfo.name}</Button>
             <ToggleButton
                 value="check"
                 selected={selected}

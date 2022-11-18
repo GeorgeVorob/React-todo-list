@@ -7,8 +7,9 @@ import '@fontsource/roboto/700.css';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import TaskList from './components/TaskList';
 import { Box } from '@mui/material';
+import TaskList from './components/TaskList';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 const darkTheme = createTheme({
   palette: {
@@ -16,21 +17,24 @@ const darkTheme = createTheme({
   },
 });
 
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <main>
-        <Box
-          sx={{
-            maxWidth: 700,
-            margin: '0px auto 0px auto'
-          }}>
-          <TaskList />
-        </Box>
-      </main>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <main>
+          <Box
+            sx={{
+              maxWidth: 700,
+              margin: '0px auto 0px auto'
+            }}>
+            <TaskList />
+          </Box>
+        </main>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
