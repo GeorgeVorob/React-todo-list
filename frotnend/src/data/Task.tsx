@@ -16,3 +16,8 @@ export const NewTaskSchema = z.object({
 });
 
 export type TaskType = z.infer<typeof TaskSchema>;
+
+export type NewTaskInputs = {
+    name: string,
+    desc: string,
+};

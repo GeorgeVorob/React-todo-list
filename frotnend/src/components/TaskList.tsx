@@ -7,12 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import APIService from "../services/APIService";
 import TaskCard from "./TaskCard";
 import TaskViewAndEditModal from "./TaskViewAndEditModal";
-import { NewTaskSchema, TaskType } from "../data/Task";
-
-type NewTaskInputs = {
-    name: string,
-    desc: string,
-};
+import { NewTaskInputs, NewTaskSchema, TaskType } from "../data/Task";
 
 
 function TaskList() {
@@ -58,8 +53,8 @@ function TaskList() {
     function OnModalClose() {
         SetTaskInModal(null);
     }
-    function OnTaskInModalUpdate(id: number, newDesc: string) {
-        updateTaskMutation.mutate({ id: id, desc: newDesc });
+    function OnTaskInModalUpdate(id: number, newDesc: string, newName: string) {
+        updateTaskMutation.mutate({ id: id, desc: newDesc, name: newName });
     }
 
     let tasksDisplay;
@@ -95,7 +90,7 @@ function TaskList() {
                 required
                 id="task-name"
                 label="New task name"
-                defaultValue="Hello World"
+                defaultValue="Do stuff"
                 {...register("name")}
             />
             {errors.name && <span>{errors.name.message}</span>}

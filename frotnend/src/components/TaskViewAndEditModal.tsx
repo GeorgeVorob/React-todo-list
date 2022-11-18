@@ -1,11 +1,13 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Backdrop, Box, Button, Fade, Modal, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { TaskType } from "../data/Task";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { NewTaskInputs, NewTaskSchema, TaskType } from "../data/Task";
 
 interface TaskViewAndEditModalProps {
     taskInfo: TaskType | null
     closeCallback: () => void
-    updateTaskCallback: (id: number, newDesc: string) => void
+    updateTaskCallback: (id: number, newDesc: string, newName: string) => void
 }
 
 function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
@@ -22,33 +24,31 @@ function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
     };
 
     const [editMode, setEditMode] = useState(false);
-    const [editableDesc, setEditableDesc] = useState("");
 
     function OnModalClose() {
-        setEditMode(false);
         props.closeCallback();
+        setEditMode(false);
     }
 
     function OnEditStart() {
-        setEditableDesc(props.taskInfo?.desc!);
-
+        reset();
         setEditMode(true);
     }
-
-    const HandleDescEdit = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEditableDesc(event.target.value);
-    };
-
-    function OnEditSubmit() {
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<NewTaskInputs>({
+        resolver: zodResolver(NewTaskSchema)
+    });
+    const onTaskUpdateSubmit: SubmitHandler<NewTaskInputs> = (data) => {
         setEditMode(false);
-
-        props.updateTaskCallback(props.taskInfo?.id!, editableDesc);
-        props.closeCallback();
+        props.updateTaskCallback(props.taskInfo?.id!, data.desc, data.name);
+        OnModalClose();
     }
 
     let taskData;
     if (!editMode) {
         taskData = (<>
+            <Typography id="transition-modal-title" variant="h6" component="h2">
+                {props.taskInfo?.name}
+            </Typography>
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
                 {props.taskInfo?.desc}
             </Typography>
@@ -57,11 +57,23 @@ function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
     }
     else {
         taskData = (
-            <>
-                <TextField sx={{ width: '100%', marginBottom: '10px' }} multiline id='new-desc' rows={5} value={editableDesc} onChange={HandleDescEdit} />
-                <Button onClick={OnEditSubmit}>Save</Button>
+            <form onSubmit={handleSubmit(onTaskUpdateSubmit)}>
+                <TextField
+                    required
+                    id="task-name"
+                    label="New task name"
+                    defaultValue={props.taskInfo?.name}
+                    {...register("name")}
+                />
+                {errors.name && <span>{errors.name.message}</span>}
+                <TextField
+                    defaultValue={props.taskInfo?.desc}
+                    sx={{ width: '100%', marginBottom: '10px' }} multiline id='new-desc' rows={5}
+                    {...register("desc")}
+                />
+                <Button type="submit">Save</Button>
                 <Button onClick={() => setEditMode(false)}>Discard</Button>
-            </>
+            </form>
         )
     }
 
@@ -79,10 +91,7 @@ function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
                 }}
             >
                 <Fade in={props.taskInfo ? true : false}>
-                    <Box sx={style}>
-                        <Typography id="transition-modal-title" variant="h6" component="h2">
-                            {props.taskInfo?.name}
-                        </Typography>
+                    <Box sx={style} key={props.taskInfo?.id}>
                         <p>Created 12.12.2012</p>
                         <p>Status: {props.taskInfo?.completed ? 'completed' : 'in progress'}</p>
                         {taskData}
