@@ -8,7 +8,7 @@ interface TaskCardProps {
     taskInfo: TaskType
     cardClickCallback: (id: number) => void
     deleteButtonClickCallback: (id: number) => void
-    taskToggleCallback: (id: number) => void
+    taskToggleCallback: (id: number, state: boolean) => void
 }
 
 function TaskCard(props: TaskCardProps) {
@@ -23,7 +23,7 @@ function TaskCard(props: TaskCardProps) {
         event.stopPropagation();
 
         setSelected(!selected);
-        props.taskToggleCallback(0);
+        props.taskToggleCallback(props.taskInfo.id, !props.taskInfo.completed);
     }
 
     const [selected, setSelected] = useState(false);
@@ -42,7 +42,7 @@ function TaskCard(props: TaskCardProps) {
             >{props.taskInfo.name}</Button>
             <ToggleButton
                 value="check"
-                selected={selected}
+                selected={props.taskInfo.completed}
                 onChange={OnToggleClick}
             >
                 <CheckIcon />

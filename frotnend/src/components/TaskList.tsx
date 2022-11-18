@@ -1,5 +1,5 @@
 import { Button, Divider, List, TextField } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +26,12 @@ function TaskList() {
             queryClient.invalidateQueries({ queryKey: ['getTasks'] })
         },
     })
+    const updateTaskMutation = useMutation({
+        mutationFn: APIService.UpdateTask,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['getTasks'] })
+        },
+    })
 
     const { register, handleSubmit, formState: { errors } } = useForm<NewTaskInputs>({
         resolver: zodResolver(NewTaskSchema)
@@ -34,23 +40,22 @@ function TaskList() {
         newTaskMutation.mutate({ name: data.name, desc: data.desc });
     }
 
-    function OnTaskClick() {
-        SetModalOpened(true);
-    }
-
     function OnTaskDeleteButtonClick() {
         alert(2);
     }
 
-    function OnTaskToggle() {
-        alert(3);
+    function OnTaskToggle(id: number, state: boolean) {
+        updateTaskMutation.mutate({ id: id, completed: state });
+    }
+
+
+    function OnTaskClick() {
+        SetModalOpened(true);
     }
 
     function OnModalClose() {
         SetModalOpened(false);
     }
-
-    useEffect(() => console.log(errors as any), [errors])
 
     let tasksDisplay;
     if (status == "loading") {
@@ -72,7 +77,6 @@ function TaskList() {
             </div>)
         })
     }
-
     return (<>
         <List>
             {tasksDisplay}

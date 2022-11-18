@@ -21,6 +21,24 @@ class APIService {
                 body: JSON.stringify({ name: data.name, desc: data.desc })
             });
     }
+
+    static UpdateTask(
+        data: {
+            id: number
+            name?: string,
+            desc?: string,
+            completed?: boolean
+        }
+    ): Promise<Response> {
+        return fetch(process.env.REACT_APP_API_ADDRESS as any,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+    };
 }
 
 export default APIService;
