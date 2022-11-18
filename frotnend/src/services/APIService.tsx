@@ -39,6 +39,13 @@ class APIService {
                 body: JSON.stringify(data)
             });
     };
+
+    static DeleteTask(id: number): Promise<Response> {
+        return fetch(process.env.REACT_APP_API_ADDRESS as any + `?id=${id}`,
+            {
+                method: 'DELETE'
+            });
+    };
 }
 
 export default APIService;

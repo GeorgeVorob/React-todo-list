@@ -16,7 +16,7 @@ function TaskCard(props: TaskCardProps) {
     function OnDeleteButtonClick(event: React.MouseEvent) {
         event.stopPropagation();
 
-        props.deleteButtonClickCallback(0);
+        props.deleteButtonClickCallback(props.taskInfo.id);
     }
 
     function OnToggleClick(event: React.MouseEvent) {

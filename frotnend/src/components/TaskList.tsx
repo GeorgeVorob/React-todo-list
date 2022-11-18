@@ -32,6 +32,12 @@ function TaskList() {
             queryClient.invalidateQueries({ queryKey: ['getTasks'] })
         },
     })
+    const deleteTaskMutation = useMutation({
+        mutationFn: APIService.DeleteTask,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['getTasks'] })
+        },
+    })
 
     const { register, handleSubmit, formState: { errors } } = useForm<NewTaskInputs>({
         resolver: zodResolver(NewTaskSchema)
@@ -40,8 +46,8 @@ function TaskList() {
         newTaskMutation.mutate({ name: data.name, desc: data.desc });
     }
 
-    function OnTaskDeleteButtonClick() {
-        alert(2);
+    function OnTaskDeleteButtonClick(id: number) {
+        deleteTaskMutation.mutate(id);
     }
 
     function OnTaskToggle(id: number, state: boolean) {
