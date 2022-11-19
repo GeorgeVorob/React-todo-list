@@ -3,6 +3,9 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSnackbar } from 'notistack';
+import { TransitionGroup } from 'react-transition-group';
+import Collapse from '@mui/material/Collapse';
 
 import APIService from "../services/APIService";
 import TaskCard from "./TaskCard";
@@ -11,25 +14,39 @@ import { NewTaskInputs, NewTaskSchema, TaskType } from "../data/Task";
 
 
 function TaskList() {
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
     const queryClient = useQueryClient();
     const { status, data } = useQuery({ queryKey: ['getTasks'], queryFn: APIService.GetTasks })
     const newTaskMutation = useMutation({
         mutationFn: APIService.CreateTask,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['getTasks'] })
+            enqueueSnackbar('Task created!');
         },
+        onError: () => {
+            enqueueSnackbar('Error creating task!');
+        }
     })
     const updateTaskMutation = useMutation({
         mutationFn: APIService.UpdateTask,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['getTasks'] })
+            enqueueSnackbar('Task updated!');
         },
+        onError: () => {
+            enqueueSnackbar('Error updating task!');
+        }
     })
     const deleteTaskMutation = useMutation({
         mutationFn: APIService.DeleteTask,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['getTasks'] })
+            enqueueSnackbar('Task deleted!');
         },
+        onError: () => {
+            enqueueSnackbar('Error deleting task!');
+        }
     })
 
     const { register, handleSubmit, formState: { errors } } = useForm<NewTaskInputs>({
@@ -58,15 +75,20 @@ function TaskList() {
     }
 
     let tasksDisplay;
-    if (status == "loading") {
-        tasksDisplay = <h3>Loading...</h3>
+    if (status === "loading") {
+        tasksDisplay =
+            <Collapse key={-1}>
+                <h3>Loading...</h3>
+            </Collapse>
     }
-    if (status == "error") {
-        tasksDisplay = <h3>Error!</h3>
+    if (status === "error") {
+        <Collapse key={-2}>
+            <h3>Error!</h3>
+        </Collapse>
     }
-    if (status == "success") {
+    if (status === "success") {
         tasksDisplay = data.map(t => {
-            return (<div key={t.id}>
+            return (<Collapse key={t.id}>
                 <TaskCard
                     taskInfo={t}
                     cardClickCallback={OnTaskClick}
@@ -74,12 +96,14 @@ function TaskList() {
                     taskToggleCallback={OnTaskToggle}
                 ></TaskCard>
                 <Divider />
-            </div>)
+            </Collapse>)
         })
     }
     return (<>
         <List>
-            {tasksDisplay}
+            <TransitionGroup>
+                {tasksDisplay}
+            </TransitionGroup>
         </List>
 
         {/*New task form. TODO: Move to external component. */}
@@ -97,7 +121,6 @@ function TaskList() {
             <TextField
                 label="Description"
                 sx={{ width: '100%' }}
-                multiline
                 id='task-desc'
                 {...register("desc")} />
             <Button type="submit">Add</Button>
