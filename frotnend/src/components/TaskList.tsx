@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSnackbar } from 'notistack';
 
 import APIService from "../services/APIService";
 import TaskCard from "./TaskCard";
@@ -11,25 +12,39 @@ import { NewTaskInputs, NewTaskSchema, TaskType } from "../data/Task";
 
 
 function TaskList() {
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
     const queryClient = useQueryClient();
     const { status, data } = useQuery({ queryKey: ['getTasks'], queryFn: APIService.GetTasks })
     const newTaskMutation = useMutation({
         mutationFn: APIService.CreateTask,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['getTasks'] })
+            enqueueSnackbar('Task created!');
         },
+        onError: () => {
+            enqueueSnackbar('Error creating task!');
+        }
     })
     const updateTaskMutation = useMutation({
         mutationFn: APIService.UpdateTask,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['getTasks'] })
+            enqueueSnackbar('Task updated!');
         },
+        onError: () => {
+            enqueueSnackbar('Error updating task!');
+        }
     })
     const deleteTaskMutation = useMutation({
         mutationFn: APIService.DeleteTask,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['getTasks'] })
+            enqueueSnackbar('Task deleted!');
         },
+        onError: () => {
+            enqueueSnackbar('Error deleting task!');
+        }
     })
 
     const { register, handleSubmit, formState: { errors } } = useForm<NewTaskInputs>({
