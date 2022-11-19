@@ -92,7 +92,7 @@ function TaskViewAndEditModal(props: TaskViewAndEditModalProps) {
             >
                 <Fade in={props.taskInfo ? true : false}>
                     <Box sx={style} key={props.taskInfo?.id}>
-                        <p>Created 12.12.2012</p>
+                        <p>Created {new Date(props.taskInfo?.createdAt).toString()}</p>
                         <p>Status: {props.taskInfo?.completed ? 'completed' : 'in progress'}</p>
                         {taskData}
                     </Box>
