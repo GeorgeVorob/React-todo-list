@@ -2,7 +2,7 @@ import { TaskType } from "../data/Task";
 
 class APIService {
     static GetTasks(): Promise<TaskType[]> {
-        return fetch(process.env.REACT_APP_API_ADDRESS as any)
+        return fetch(import.meta.env.VITE_API_ADDRESS as any)
             .then((res) => {
                 if (!res.ok) throw new Error();
                 return res.json();
@@ -15,7 +15,7 @@ class APIService {
             desc: string
         }
     ): Promise<Response> {
-        return fetch(process.env.REACT_APP_API_ADDRESS as any,
+        return fetch(import.meta.env.VITE_API_ADDRESS as any,
             {
                 method: 'POST',
                 headers: {
@@ -37,7 +37,7 @@ class APIService {
             completed?: boolean
         }
     ): Promise<Response> {
-        return fetch(process.env.REACT_APP_API_ADDRESS as any,
+        return fetch(import.meta.env.VITE_API_ADDRESS as any,
             {
                 method: 'PUT',
                 headers: {
@@ -52,7 +52,7 @@ class APIService {
     };
 
     static DeleteTask(id: number): Promise<Response> {
-        return fetch(process.env.REACT_APP_API_ADDRESS as any + `?id=${id}`,
+        return fetch(import.meta.env.VITE_API_ADDRESS as any + `?id=${id}`,
             {
                 method: 'DELETE'
             })
