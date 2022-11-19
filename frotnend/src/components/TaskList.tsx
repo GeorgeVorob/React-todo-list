@@ -18,6 +18,7 @@ function TaskList() {
 
     const queryClient = useQueryClient();
     const { status, data } = useQuery({ queryKey: ['getTasks'], queryFn: APIService.GetTasks })
+
     const newTaskMutation = useMutation({
         mutationFn: APIService.CreateTask,
         onSuccess: () => {
