@@ -97,7 +97,6 @@ function TaskList() {
             <TextField
                 label="Description"
                 sx={{ width: '100%' }}
-                multiline
                 id='task-desc'
                 {...register("desc")} />
             <Button type="submit">Add</Button>
